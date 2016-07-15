@@ -34,7 +34,7 @@ from .__version__ import __version__
 from .elm327 import ELM327
 from .commands import commands
 from .OBDResponse import OBDResponse
-from .utils import scan_serial, OBDStatus
+from .utils import OBDStatus
 from .debug import debug
 
 
@@ -61,25 +61,7 @@ class OBD(object):
         """
             Attempts to instantiate an ELM327 connection object.
         """
-
-        if portstr is None:
-            debug("Using scan_serial to select port")
-            portnames = scan_serial()
-            debug("Available ports: " + str(portnames))
-
-            if not portnames:
-                debug("No OBD-II adapters found", True)
-                return
-
-            for port in portnames:
-                debug("Attempting to use port: " + str(port))
-                self.port = ELM327(port, baudrate, protocol)
-
-                if self.port.status() >= OBDStatus.ELM_CONNECTED:
-                    break # success! stop searching for serial
-        else:
-            debug("Explicit port defined")
-            self.port = ELM327(portstr, baudrate, protocol)
+        self.port = ELM327()
 
         # if the connection failed, close it
         if self.port.status == OBDStatus.NOT_CONNECTED:

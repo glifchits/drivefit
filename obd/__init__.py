@@ -43,5 +43,5 @@ from .commands import commands
 from .OBDCommand import OBDCommand
 from .OBDResponse import OBDResponse, Unit
 from .protocols import ECU
-from .utils import scan_serial, scanSerial, OBDStatus # TODO: scanSerial() deprecated
+from .utils import OBDStatus
 from .debug import debug

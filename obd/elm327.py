@@ -30,7 +30,8 @@
 ########################################################################
 
 import re
-import serial
+import socket
+# import serial
 import time
 from .protocols import *
 from .utils import OBDStatus
@@ -86,29 +87,35 @@ class ELM327:
     ]
 
 
-    def __init__(self, portname, baudrate, protocol):
+    def __init__(self, protocol=None):
         """Initializes port by resetting device and gettings supported PIDs. """
 
         self.__status   = OBDStatus.NOT_CONNECTED
-        self.__port     = None
+        self.__socket   = None
         self.__protocol = UnknownProtocol([])
 
 
         # ------------- open port -------------
+        # try:
+        #     debug("Opening serial port '%s'" % portname)
+        #     self.__port = serial.Serial(portname, \
+        #                                 baudrate = baudrate, \
+        #                                 parity   = serial.PARITY_NONE, \
+        #                                 stopbits = 1, \
+        #                                 bytesize = 8, \
+        #                                 timeout  = 3) # seconds
+        #     debug("Serial port successfully opened on " + self.port_name())
+        #
+        # except serial.SerialException as e:
+        #     self.__error(e)
+        #     return
+        # except OSError as e:
+        #     self.__error(e)
+        #     return
         try:
-            debug("Opening serial port '%s'" % portname)
-            self.__port = serial.Serial(portname, \
-                                        baudrate = baudrate, \
-                                        parity   = serial.PARITY_NONE, \
-                                        stopbits = 1, \
-                                        bytesize = 8, \
-                                        timeout  = 3) # seconds
-            debug("Serial port successfully opened on " + self.port_name())
-
-        except serial.SerialException as e:
-            self.__error(e)
-            return
-        except OSError as e:
+            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__socket.connect(('192.168.0.10', 35000))
+        except Exception as e:
             self.__error(e)
             return
 
@@ -117,7 +124,7 @@ class ELM327:
         try:
             self.__send("ATZ", delay=1) # wait 1 second for ELM to initialize
             # return data can be junk, so don't bother checking
-        except serial.SerialException as e:
+        except Exception as e:
             self.__error(e)
             return
 
@@ -255,8 +262,8 @@ class ELM327:
 
 
     def port_name(self):
-        if self.__port is not None:
-            return self.__port.portstr
+        if self.__socket is not None:
+            return self.__socket.gethostname()
         else:
             return "No Port"
 
@@ -286,10 +293,10 @@ class ELM327:
         self.__status   = OBDStatus.NOT_CONNECTED
         self.__protocol = None
 
-        if self.__port is not None:
+        if self.__socket is not None:
             self.__write("ATZ")
-            self.__port.close()
-            self.__port = None
+            self.__socket.close()
+            self.__socket = None
 
 
     def send_and_parse(self, cmd):
@@ -336,12 +343,12 @@ class ELM327:
             "low-level" function to write a string to the port
         """
 
-        if self.__port:
+        if self.__socket:
             cmd += "\r\n" # terminate
             debug("write: " + repr(cmd))
-            self.__port.flushInput() # dump everything in the input buffer
-            self.__port.write(cmd.encode()) # turn the string into bytes and write
-            self.__port.flush() # wait for the output buffer to finish transmitting
+            # self.__port.flushInput() # dump everything in the input buffer
+            self.__socket.send(cmd.encode()) # turn the string into bytes and write
+            # self.__port.flush() # wait for the output buffer to finish transmitting
         else:
             debug("cannot perform __write() when unconnected", True)
 
@@ -357,9 +364,9 @@ class ELM327:
         attempts = 2
         buffer = b''
 
-        if self.__port:
+        if self.__socket:
             while True:
-                c = self.__port.read(1)
+                c = self.__socket.recv(1)
 
                 # if nothing was recieved
                 if not c:
