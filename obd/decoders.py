@@ -281,7 +281,7 @@ def status(messages):
                              bitToBool(bits[9])))
 
 
-    # different tests for different ignition types 
+    # different tests for different ignition types
     if(output.ignition_type == IGNITION_TYPE[0]): # spark
         for i in range(8):
             if SPARK_TESTS[i] is not None:
@@ -299,7 +299,7 @@ def status(messages):
                 t = Test(COMPRESSION_TESTS[i], \
                          bitToBool(bits[(2 * 8) + i]), \
                          bitToBool(bits[(3 * 8) + i]))
-                
+
                 output.tests.append(t)
 
     return (output, Unit.NONE)
@@ -353,27 +353,29 @@ def air_status(messages):
 
 
 def obd_compliance(_hex):
-    d = messages[0].data
-    i = d[0]
-
-    v = "Error: Unknown OBD compliance response"
-
-    if i < len(OBD_COMPLIANCE):
-        v = OBD_COMPLIANCE[i]
-
-    return (v, Unit.NONE) 
+    pass
+    # d = messages[0].data
+    # i = d[0]
+    #
+    # v = "Error: Unknown OBD compliance response"
+    #
+    # if i < len(OBD_COMPLIANCE):
+    #     v = OBD_COMPLIANCE[i]
+    #
+    # return (v, Unit.NONE)
 
 
 def fuel_type(_hex):
-    d = messages[0].data
-    i = d[0] # todo, support second fuel system
-
-    v = "Error: Unknown fuel type response"
-
-    if i < len(FUEL_TYPES):
-        v = FUEL_TYPES[i]
-
-    return (v, Unit.NONE)
+    pass
+    # # d = messages[0].data
+    # i = d[0] # todo, support second fuel system
+    #
+    # v = "Error: Unknown fuel type response"
+    #
+    # if i < len(FUEL_TYPES):
+    #     v = FUEL_TYPES[i]
+    #
+    # return (v, Unit.NONE)
 
 
 def single_dtc(_bytes):

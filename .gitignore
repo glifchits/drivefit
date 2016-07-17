@@ -1,5 +1,8 @@
 .ipynb_notebook
 *.ipynb
+.DS_Store
+*.csv
+*.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

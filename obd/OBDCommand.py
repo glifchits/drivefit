@@ -95,7 +95,9 @@ class OBDCommand():
         # and reference to original command
         r = OBDResponse(self, messages)
         if messages:
-            r.value, r.unit = self.decode(messages)
+            msgs = self.decode(messages)
+            if msgs:
+                r.value, r.unit = msgs
 
         return r
 
