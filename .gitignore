@@ -3,6 +3,7 @@
 .DS_Store
 *.csv
 *.xlsx
+credentials.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
